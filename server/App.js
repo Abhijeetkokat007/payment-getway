@@ -2,6 +2,8 @@ import Express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import Razorpay from "razorpay";
+import OrderModel from "./model/Order.model.js";
+import crypto from 'crypto';
 dotenv.config()
 
 // import product from "./models/product.js";
@@ -14,101 +16,83 @@ const __dirname = path.resolve();
 const app = Express();
 app.use(Express.json());
 
-const PORT = process.env.PORT || 5000; 
+const PORT = process.env.PORT || 5000;
 
 const connectDB = async () => {
-    try{
+    try {
         const connection = await mongoose.connect(process.env.MONGODB_URI)
-    if (connection) {
-        console.log(`mongoDB connected`)
-    }
-    } catch(e){
+        if (connection) {
+            console.log(`mongoDB connected`)
+        }
+    } catch (e) {
         console.log(e.message);
     }
 };
 
 const key = 'rzp_live_uZqf3G3ZLTSKbH';
-const keysecret='qcLK213WvGgzZQfRHTW3woDL' ;
+const keysecret = 'qcLK213WvGgzZQfRHTW3woDL';
 
-const razorpayInstance = new Razorpay({ 
-    key_id: key  , 
-    key_secret:keysecret 
-}); 
+const razorpayInstance = new Razorpay({
+    key_id: key,
+    key_secret: keysecret
+});
 
 
 
-// signup
-// app.post("/api/signup", async (req, res) => {
-//     const { name, email, mobile, address, password, gender } = req.body;
-//     const newUser = new auth({
-//         name,
-//         email,
-//         mobile,
-//         address,
-//         password : md5(password),
-//         gender,
-//     });
-
-//     try {
-//         const saveuser = await newUser.save();
-//         res.json({
-//             success: true,
-//             data: saveuser,
-//             message: "user created successfully."
-
-//         })
-//     } catch (e) {
-//         res.json({
-//             success: false,
-//             message: e.message
-//         })
-//     }
-// }
-// )
-
-// post login
-// app.post("/api/login", async (req, res) => {
-//     const { email, password   } = req.body;
-
-//     if (!email || !password) {
-//         return res.json({
-//             success: false,
-//             message: "invalid email and password"
-//         })
-//     }
-
-//     const user = await auth.findOne({
-//         email: email,
-//         password: md5(password)
-//     })
-//     if (user) {
-//         res.json({
-//             success: true,
-//             data: user,
-//             message: "login succesfull"
-//         })
-//     }
-//     else {
-//         res.json({
-//             success: false,
-
-//             message: "invalid data"
-//         })
-//     }
-// })
 
 
 
 // get product
-app.get("/api/payment/checkout", async (req, res) => {
-    const { name, amount } = req.body;
-    const order = await razorpayInstance.orders.create({
-        amount: Number(amount*100),
-        currency: "INR",
-        re
-    }) 
+app.post("/api/payment/checkout", async (req, res) => {
+    try {
+        const { name, amount } = req.body;
+        const order = await razorpayInstance.orders.create({
+            amount: Number(amount * 100),
+            currency: "INR",
 
-    res.json(order)
+        })
+
+        await OrderModel.create({
+            order_id: order.id,
+            name: name,
+            amount: amount
+        })
+        console.log({ order })
+        res.json(order)
+    }
+    catch (e) {
+        console.log(e.message)
+    }
+})
+
+app.post("/api/payment/payment-verification", async (req, res) => {
+    try {
+        const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
+
+        const body_dada = razorpay_order_id + " " + razorpay_payment_id
+
+        const expect = crypto.createHmac('sha256', 'qcLK213WvGgzZQfRHTW3woDL')
+            .update(body_dada).digest('hex')
+
+        const isValid = expect === razorpay_signature;
+        if (isValid) {
+            await OrderModel.findOne({ order_id: razorpay_order_id }, {
+                $set: {
+                    razorpay_payment_id, razorpay_order_id, razorpay_signature
+                }
+            })
+            res.redirect(`http://localhost:3000/success?payment_id=${razorpay_payment_id}`)
+            return
+        }
+        else {
+            res.redirect("http://localhost:3000/failed")
+            return
+        }
+
+    }
+    catch (e) {
+        console.log(e.message)
+    }
 })
 
 // delet product
@@ -155,7 +139,7 @@ app.get("/api/payment/checkout", async (req, res) => {
 //     })
 //    try{
 //     const savedata = await neworder.save();
-   
+
 //     res.json({
 //         success: true,
 //         data: savedata,
@@ -168,20 +152,20 @@ app.get("/api/payment/checkout", async (req, res) => {
 //         message: e.message
 //     })
 // }
- 
+
 // })
 
 
 
 
 
- if(process.env.NODE_ENV === "production"){
-    app.use(Express.static(path.join(__dirname, '..', 'client', 'build'))); 
-   
+if (process.env.NODE_ENV === "production") {
+    app.use(Express.static(path.join(__dirname, '..', 'client', 'build')));
+
     app.get('*', (req, res) => {
-     res.sendFile(path.join(__dirname, '..', 'client', 'build', 'index.html'))
+        res.sendFile(path.join(__dirname, '..', 'client', 'build', 'index.html'))
     });
-   }
+}
 
 
 
