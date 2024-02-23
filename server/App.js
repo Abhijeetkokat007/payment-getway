@@ -6,11 +6,9 @@ import OrderModel from "./model/Order.model.js";
 import crypto from 'crypto';
 dotenv.config()
 
-// import product from "./models/product.js";
-// import order  from './models/order.js';
-// import md5 from "md5";
+
 import path from "path";
-// import auth from "./models/auth.js";
+
 const __dirname = path.resolve();
 
 const app = Express();
@@ -32,17 +30,31 @@ const connectDB = async () => {
 const key = 'rzp_live_uZqf3G3ZLTSKbH';
 const keysecret = 'qcLK213WvGgzZQfRHTW3woDL';
 
+// const key = 'rzp_live_CFMWv5JxguuAjG';
+// const keysecret = 'VF6B5lr1GoFYahuIF0xrHmDj';
+
 const razorpayInstance = new Razorpay({
     key_id: key,
     key_secret: keysecret
 });
 
+app.use((req, res, next) => {
+  
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    
+    next();
+  });
+
+app.get("/", (req, res)=>{
+ res.send("<h1> server running</h>")
+})
 
 
 
-
-
-// get product
 app.post("/api/payment/checkout", async (req, res) => {
     try {
         const { name, amount } = req.body;
@@ -95,65 +107,10 @@ app.post("/api/payment/payment-verification", async (req, res) => {
     }
 })
 
-// delet product
-// app.delete("/api/product/:_id", async (req, res) => {
-//     const { _id } = req.params;
-//     const product1 = await product.deleteOne({ _id: _id })
-//     res.json({
-//         success: true,
-//         data: product1,
-//         message: `successfully deleted one product data. `,
-//     });
-// })
 
-// get product search
-// app.get("/api/products/search", async (req, res) => {
-//     const { q } = req.query;
-//     try {
-//         const product1 = await product.find({ title: { $regex: q, $options: "i" } })
-//         res.json({
-//             success: true,
-//             data: product1,
-//             message: `successfully searched product. `,
-//         });
-//     }
-//     catch (e) {
-//         res.json({
-//             success: false,
-//             message: e.message
-//         })
-//     }
-// })
 
-// post order 
-// app.post("/api/order", async (req, res) => {
-//     const { user, product, shipingaddress, status, quentity , deliverycharge} = req.body;
 
-//     const neworder = new order({
-//         user,
-//         product,
-//         shipingaddress,
-//         status,
-//         quentity,
-//         deliverycharge
-//     })
-//    try{
-//     const savedata = await neworder.save();
 
-//     res.json({
-//         success: true,
-//         data: savedata,
-//         message: "new order  successfully."
-//     })
-//    }
-//    catch (e) {
-//     res.json({
-//         success: false,
-//         message: e.message
-//     })
-// }
-
-// })
 
 
 
