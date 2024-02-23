@@ -27,20 +27,18 @@ const connectDB = async () => {
     }
 };
 
-const key = 'rzp_live_uZqf3G3ZLTSKbH';
-const keysecret = 'qcLK213WvGgzZQfRHTW3woDL';
 
-// const key = 'rzp_live_CFMWv5JxguuAjG';
-// const keysecret = 'VF6B5lr1GoFYahuIF0xrHmDj';
+
+
 
 const razorpayInstance = new Razorpay({
-    key_id: key,
-    key_secret: keysecret
+    key_id: process.env.key,
+    key_secret:process.env.keysecret
 });
 
 app.use((req, res, next) => {
   
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.setHeader('Access-Control-Allow-Origin', 'https://payment-getway-ak.vercel.app');
     
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
     
