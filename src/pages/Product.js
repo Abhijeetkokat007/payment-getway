@@ -33,8 +33,8 @@ function Product() {
         };
         var rzp1 = new window.Razorpay(options);
         rzp1.open();
-        console.log({ order })
-        console.log(console.log({ order }))
+        // console.log({ order })
+        // console.log(console.log({ order }))
     }
 
     // console.log(data)
