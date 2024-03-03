@@ -27,14 +27,17 @@ const connectDB = async () => {
     }
 };
 
+console.log("key id: ",process.env.key)
 
-
-
+const key = process.env.key ;
+const keysecret = process.env.keysecret;
 
 const razorpayInstance = new Razorpay({
-    key_id: process.env.key,
-    key_secret:process.env.keysecret
+    key_id: key,
+    key_secret:keysecret,
+    
 });
+
 
 app.use((req, res, next) => {
   
