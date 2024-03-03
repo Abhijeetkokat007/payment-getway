@@ -39,20 +39,20 @@ const razorpayInstance = new Razorpay({
 });
 
 
-app.use((req, res, next) => {
+// app.use((req, res, next) => {
   
-    res.setHeader('Access-Control-Allow-Origin', 'https://payment-getway-ak.vercel.app');
+//     res.setHeader('Access-Control-Allow-Origin', 'https://payment-getway-ak.vercel.app');
     
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+//     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
     
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+//     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     
-    next();
-  });
+//     next();
+//   });
 
-app.get("/", (req, res)=>{
- res.send("<h1> server running</h>")
-})
+// app.get("/", (req, res)=>{
+//  res.send("<h1> server running</h>")
+// })
 
 
 
@@ -117,16 +117,16 @@ app.post("/api/payment/payment-verification", async (req, res) => {
 
 
 
-
-
-
-if (process.env.NODE_ENV === "production") {
+if (process.env.NODE_ENV === 'production') {
     app.use(Express.static(path.join(__dirname, '..', 'client', 'build')));
-
+  
     app.get('*', (req, res) => {
-        res.sendFile(path.join(__dirname, '..', 'client', 'build', 'index.html'))
+      res.sendFile(path.join(__dirname, '..', 'client', 'build', 'index.html'))
     });
-}
+  }
+
+
+
 
 
 
