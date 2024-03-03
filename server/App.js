@@ -74,7 +74,10 @@ app.post("/api/payment/checkout", async (req, res) => {
         res.json(order)
     }
     catch (e) {
-        console.log(e.message)
+        res.json({
+            success: false,
+            message: err.message
+        })
     }
 })
 
